@@ -2,7 +2,9 @@ name = "petcarebackend"
 main = "worker.js"
 compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
-node_compat = true
+
+[alias]
+"stream" = "./stream-polyfill.js"
 
 [vars]
 # Add environment variables here, e.g., MONGO_URI, PORT, FRONTEND_URL
