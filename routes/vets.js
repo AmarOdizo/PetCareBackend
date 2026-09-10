@@ -32,7 +32,7 @@ router.get("/", async function (req, res) {
     if (req.query.city) {
       query.city = new RegExp(req.query.city, 'i');
     }
-    
+
     if (req.query.specialization) {
       query.specialization = req.query.specialization; // Match if array contains it
     }
@@ -52,7 +52,7 @@ router.get("/", async function (req, res) {
       data: safeVets
     });
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    return res.status(200).json({ success: false, message: error.message });
   }
 });
 
@@ -65,10 +65,10 @@ router.get("/me", verifyDoctorAuth, async function (req, res) {
 router.get("/:id", async function (req, res) {
   try {
     const idParam = req.params.id;
-    
+
     let query = { $or: [{ vciNumber: new RegExp('^' + idParam + '$', 'i') }] };
     if (mongoose.Types.ObjectId.isValid(idParam)) {
-        query.$or.unshift({ _id: idParam });
+      query.$or.unshift({ _id: idParam });
     }
 
     const dbVet = await Vet.findOne(query);
@@ -90,21 +90,21 @@ router.put("/:id", async function (req, res) {
   try {
     const idParam = req.params.id;
     const updateData = req.body;
-    
+
     if (!mongoose.Types.ObjectId.isValid(idParam)) {
-        return res.status(404).json({ success: false, message: "Invalid Vet ID format." });
+      return res.status(404).json({ success: false, message: "Invalid Vet ID format." });
     }
 
     const updatedVet = await Vet.findByIdAndUpdate(
-        idParam,
-        { $set: updateData },
-        { new: true }
+      idParam,
+      { $set: updateData },
+      { new: true }
     );
 
     if (!updatedVet) {
-       return res.status(404).json({ success: false, message: "Vet not found." });
+      return res.status(404).json({ success: false, message: "Vet not found." });
     }
-    
+
     const safeVet = updatedVet.toObject();
     delete safeVet.password;
     return res.json({ success: true, vet: safeVet });
@@ -122,12 +122,12 @@ router.get("/:id/dashboard", verifyDoctorAuth, async function (req, res) {
   try {
     const idParam = req.params.id;
     const todayStr = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
-    
+
     const allConsults = await Consultation.find({ vetId: idParam }).sort({ createdAt: -1 });
 
     const todaysConsultations = allConsults.filter(c => c.date === todayStr);
     const completed = allConsults.filter(c => c.status === 'completed');
-    
+
     return res.json({
       success: true,
       doctorId: idParam,
@@ -139,7 +139,7 @@ router.get("/:id/dashboard", verifyDoctorAuth, async function (req, res) {
       },
       appointments: allConsults
     });
-  } catch(err) {
+  } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
   }
 });
@@ -156,7 +156,7 @@ router.get("/:id/appointments", verifyDoctorAuth, async function (req, res) {
       count: dbAppointments.length,
       appointments: dbAppointments
     });
-  } catch(err) {
+  } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
   }
 });
@@ -167,10 +167,10 @@ router.post("/:id/appointments", async function (req, res) {
     const idParam = req.params.id;
     const body = req.body;
     body.vetId = idParam;
-    
+
     const newAppt = new Appointment(body);
     await newAppt.save();
-    
+
     return res.status(201).json({ success: true, appointment: newAppt });
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
@@ -205,10 +205,10 @@ router.post("/:id/prescriptions", verifyDoctorAuth, async function (req, res) {
     const idParam = req.params.id;
     const body = req.body;
     body.vetId = idParam;
-    
+
     const newPrescription = new Prescription(body);
     await newPrescription.save();
-    
+
     return res.status(201).json({
       success: true,
       message: "Prescription issued successfully",
@@ -223,7 +223,7 @@ router.post("/:id/prescriptions", verifyDoctorAuth, async function (req, res) {
 router.get("/:id/prescriptions", verifyDoctorAuth, async function (req, res) {
   try {
     const idParam = req.params.id;
-    
+
     const dbPrescriptions = await Prescription.find({ vetId: idParam }).sort({ createdAt: -1 });
 
     return res.json({ success: true, prescriptions: dbPrescriptions });
@@ -236,7 +236,7 @@ router.get("/:id/prescriptions", verifyDoctorAuth, async function (req, res) {
 router.get("/:id/earnings", verifyDoctorAuth, async function (req, res) {
   try {
     const idParam = req.params.id;
-    
+
     const allAppts = await Appointment.find({ vetId: idParam, status: 'completed' });
 
     const totalEarnings = allAppts.reduce((sum, c) => sum + (Number(c.fee) || 499), 0);
@@ -254,7 +254,7 @@ router.get("/:id/earnings", verifyDoctorAuth, async function (req, res) {
         history: []
       }
     });
-  } catch(err) {
+  } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
   }
 });
@@ -302,7 +302,7 @@ router.post("/register", async function (req, res) {
     };
 
     const existingDbVet = await Vet.findOne({
-        $or: [{ email: normEmail }, { vciNumber: normVci }]
+      $or: [{ email: normEmail }, { vciNumber: normVci }]
     });
 
     if (existingDbVet) {
@@ -350,7 +350,7 @@ router.post("/login", async function (req, res) {
     const queryRegex = new RegExp('^' + queryStr + '$', 'i');
 
     const dbVet = await Vet.findOne({
-        $or: [{ email: queryRegex }, { vciNumber: queryRegex }]
+      $or: [{ email: queryRegex }, { vciNumber: queryRegex }]
     });
 
     if (!dbVet || dbVet.password !== password) {

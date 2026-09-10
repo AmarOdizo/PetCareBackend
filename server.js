@@ -16,7 +16,10 @@ const prescriptionRoutes = require("./routes/prescriptions");
 const imagekitRoutes = require("./routes/imagekitRoutes");
 const favoriteVetsRoutes = require("./routes/favoriteVets");
 
-connectDB(); // Establish MongoDB connection
+// Establish MongoDB connection (in local Node environment; in Workers, worker.js awaits it)
+if (typeof globalThis.caches === 'undefined') {
+  connectDB();
+}
 
 const app = express();
 
