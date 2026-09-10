@@ -2,6 +2,25 @@ import serverless from 'serverless-http';
 
 let handler;
 
+// Cloudflare Workers' Request objects are immutable (read-only properties).
+// serverless-http tries to assign to request.body which throws.
+// This Proxy wrapper intercepts writes and stores them in a separate map.
+function wrapRequest(request) {
+  const overrides = {};
+  return new Proxy(request, {
+    get(target, prop, receiver) {
+      if (prop in overrides) return overrides[prop];
+      const value = Reflect.get(target, prop, target);
+      if (typeof value === 'function') return value.bind(target);
+      return value;
+    },
+    set(target, prop, value) {
+      overrides[prop] = value;
+      return true;
+    }
+  });
+}
+
 export default {
   async fetch(request, env, ctx) {
     try {
@@ -23,7 +42,7 @@ export default {
         handler = serverless(app);
       }
 
-      return await handler(request, env, ctx);
+      return await handler(wrapRequest(request), env, ctx);
     } catch (err) {
       return new Response(
         JSON.stringify({ success: false, error: err.message, stack: err.stack }),
