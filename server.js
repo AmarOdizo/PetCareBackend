@@ -1,9 +1,9 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
+dotenv.config();
 
 const connectDB = require("./config/db");
-connectDB(); // Establish MongoDB connection
 
 const apiRoutes = require("./routes/apiRoutes");
 const authRoutes = require("./routes/authRoutes");
@@ -16,7 +16,7 @@ const prescriptionRoutes = require("./routes/prescriptions");
 const imagekitRoutes = require("./routes/imagekitRoutes");
 const favoriteVetsRoutes = require("./routes/favoriteVets");
 
-dotenv.config();
+connectDB(); // Establish MongoDB connection
 
 const app = express();
 
@@ -78,26 +78,28 @@ app.use(function (req, res) {
   });
 });
 
-// Start Server
-const PORT = process.env.PORT || 5000;
+// Start Server (only in Node.js, not in Cloudflare Workers)
+if (typeof globalThis.caches === 'undefined') {
+  const PORT = process.env.PORT || 5000;
 
-const server = app.listen(PORT, function () {
-  console.log("==========================================");
-  console.log("  Gemini API Server Running Successfully  ");
-  console.log("  Port: " + PORT);
-  console.log("  Health URL: http://localhost:" + PORT + "/api/health");
-  console.log("  Auth Login: http://localhost:" + PORT + "/api/auth/login");
-  console.log("  Auth Register: http://localhost:" + PORT + "/api/auth/register");
-  console.log("  Vets API: http://localhost:" + PORT + "/api/vets");
-  console.log("  Vet Register: http://localhost:" + PORT + "/api/vets/register");
-  console.log("  Vet Login: http://localhost:" + PORT + "/api/vets/login");
-  console.log("  Pets API: http://localhost:" + PORT + "/api/pets");
-  console.log("==========================================");
-});
+  const server = app.listen(PORT, function () {
+    console.log("==========================================");
+    console.log("  Gemini API Server Running Successfully  ");
+    console.log("  Port: " + PORT);
+    console.log("  Health URL: http://localhost:" + PORT + "/api/health");
+    console.log("  Auth Login: http://localhost:" + PORT + "/api/auth/login");
+    console.log("  Auth Register: http://localhost:" + PORT + "/api/auth/register");
+    console.log("  Vets API: http://localhost:" + PORT + "/api/vets");
+    console.log("  Vet Register: http://localhost:" + PORT + "/api/vets/register");
+    console.log("  Vet Login: http://localhost:" + PORT + "/api/vets/login");
+    console.log("  Pets API: http://localhost:" + PORT + "/api/pets");
+    console.log("==========================================");
+  });
 
-// DB seeded via Supabase SQL directly.
+  // DB seeded via Supabase SQL directly.
 
-// Keep process active
-setInterval(function () {}, 1000000);
+  // Keep process active
+  setInterval(function () {}, 1000000);
+}
 
 module.exports = app;

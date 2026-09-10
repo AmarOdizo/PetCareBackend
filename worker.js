@@ -1,12 +1,27 @@
 import serverless from 'serverless-http';
-import app from './server';
 
-// Convert Express app to Cloudflare Worker fetch handler
-const handler = serverless(app);
+let handler;
 
 export default {
   async fetch(request, env, ctx) {
-    // Forward the request to the serverless-http handler
+    // Inject Cloudflare env bindings into process.env so that
+    // Express code using process.env.X works as expected.
+    if (env) {
+      for (const [key, value] of Object.entries(env)) {
+        if (typeof value === 'string') {
+          process.env[key] = value;
+        }
+      }
+    }
+
+    // Lazy-load the Express app on the first request so that all
+    // modules that read process.env at require-time (supabase, db,
+    // imagekit, etc.) see the injected values.
+    if (!handler) {
+      const app = require('./server');
+      handler = serverless(app);
+    }
+
     return handler(request, env, ctx);
   }
 };
