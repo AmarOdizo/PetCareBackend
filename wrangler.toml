@@ -4,5 +4,9 @@ compatibility_date = "2026-08-04"
 compatibility_flags = ["nodejs_compat"]
 
 [vars]
-# Add environment variables here, e.g., MONGO_URI, PORT, FRONTEND_URL
-# Or manage them via Cloudflare Dashboard / Wrangler secrets
+MONGO_URI = "mongodb+srv://POdizo:1234567890@cluster0.zximsxx.mongodb.net/gemini_api?retryWrites=true&w=majority"
+SUPABASE_URL = "https://mdlkjdnxgansppoklehv.supabase.co"
+SUPABASE_KEY = "sb_publishable_uOuh2g8wKROkfafYLjiYiA_69c0FLOv"
+IMAGEKIT_PUBLIC_KEY = "public_/PfWSDFtqlaMUzirk/U1+hFG5IM="
+IMAGEKIT_PRIVATE_KEY = "private_QugDN74pUlsdvKYLK3h6aydGtTc="
+IMAGEKIT_URL_ENDPOINT = "https://ik.imagekit.io/dios87u67"

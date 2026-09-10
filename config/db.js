@@ -15,10 +15,18 @@ const connectDB = function () {
     return Promise.resolve(false);
   }
 
-  console.log("Connecting to MongoDB at:", mongoURI);
+  if (mongoose.connection && mongoose.connection.readyState >= 1) {
+    isConnected = true;
+    return Promise.resolve(true);
+  }
+
+  console.log("Connecting to MongoDB...");
   
   return mongoose
-    .connect(mongoURI)
+    .connect(mongoURI, {
+      serverSelectionTimeoutMS: 5000,
+      connectTimeoutMS: 5000
+    })
     .then(function () {
       isConnected = true;
       console.log("MongoDB Connected Successfully");
