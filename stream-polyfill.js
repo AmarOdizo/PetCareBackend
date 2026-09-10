@@ -1,2 +1,1 @@
-export * from "node:stream";
-export { default } from "node:stream";
+module.exports = require("node:stream");
