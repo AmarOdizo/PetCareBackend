@@ -1,3 +1,4 @@
+import http from 'node:http';
 import { httpServerHandler } from 'cloudflare:node';
 
 let expressHandler;
@@ -18,10 +19,11 @@ export default {
       const connectDB = require('./config/db');
       await connectDB();
 
-      // Lazy-load Express app and initialize httpServerHandler directly with Express app instance
+      // Lazy-load Express app, create Node.js http.Server instance and pass to httpServerHandler
       if (!expressHandler) {
         const app = require('./server');
-        expressHandler = httpServerHandler(app);
+        const server = http.createServer(app);
+        expressHandler = httpServerHandler(server);
       }
 
       return expressHandler.fetch(request, env, ctx);
