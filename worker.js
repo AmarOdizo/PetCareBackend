@@ -1,31 +1,28 @@
 import { httpServerHandler } from 'cloudflare:node';
 
 let expressHandler;
-let initialized = false;
 
 export default {
   async fetch(request, env, ctx) {
     try {
-      // Inject Cloudflare env vars into process.env (once)
-      if (!initialized && env) {
+      // Inject Cloudflare env vars into process.env on each request if present
+      if (env) {
         for (const [key, value] of Object.entries(env)) {
           if (typeof value === 'string') {
             process.env[key] = value;
           }
         }
-        initialized = true;
       }
 
-      // Lazy-load Express app and start listening (once)
-      if (!expressHandler) {
-        const app = require('./server');
-        app.listen(8787);
-        expressHandler = httpServerHandler({ port: 8787 });
-      }
-
-      // Await DB connection in serverless environment so socket I/O is not paused
+      // Ensure MongoDB connection is ready
       const connectDB = require('./config/db');
       await connectDB();
+
+      // Lazy-load Express app and initialize httpServerHandler directly with Express app instance
+      if (!expressHandler) {
+        const app = require('./server');
+        expressHandler = httpServerHandler(app);
+      }
 
       return expressHandler.fetch(request, env, ctx);
     } catch (err) {
