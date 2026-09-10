@@ -23,6 +23,10 @@ export default {
         expressHandler = httpServerHandler({ port: 8787 });
       }
 
+      // Await DB connection in serverless environment so socket I/O is not paused
+      const connectDB = require('./config/db');
+      await connectDB();
+
       return expressHandler.fetch(request, env, ctx);
     } catch (err) {
       return new Response(

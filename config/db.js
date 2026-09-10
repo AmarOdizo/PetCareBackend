@@ -20,21 +20,28 @@ const connectDB = function () {
     return Promise.resolve(true);
   }
 
+  try {
+    mongoose.set('bufferCommands', false);
+  } catch(e) {}
+
   console.log("Connecting to MongoDB...");
   
   return mongoose
     .connect(mongoURI, {
       serverSelectionTimeoutMS: 5000,
-      connectTimeoutMS: 5000
+      connectTimeoutMS: 5000,
+      bufferCommands: false
     })
     .then(function () {
       isConnected = true;
       console.log("MongoDB Connected Successfully");
+      return true;
     })
     .catch(function (error) {
       isConnected = false;
       console.warn("MongoDB Connection Notice:", error.message || error);
       console.warn("API running in standalone mode without active database connection.");
+      return false;
     });
 };
 
