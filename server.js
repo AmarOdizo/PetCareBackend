@@ -16,10 +16,7 @@ const prescriptionRoutes = require("./routes/prescriptions");
 const imagekitRoutes = require("./routes/imagekitRoutes");
 const favoriteVetsRoutes = require("./routes/favoriteVets");
 
-// Only connect to MongoDB in Node.js (Mongoose needs TCP sockets, not available in Workers)
-if (typeof globalThis.caches === 'undefined') {
-  connectDB();
-}
+connectDB(); // Establish MongoDB connection
 
 const app = express();
 
