@@ -4,6 +4,7 @@
   "description": "Error-free Express backend for Gemini",
   "main": "server.js",
   "scripts": {
+    "postinstall": "node patch-iconv.js",
     "start": "node server.js",
     "dev": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 0"
