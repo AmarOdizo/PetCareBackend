@@ -52,6 +52,11 @@ app.use("/api/imagekit", imagekitRoutes);
 app.use("/api/favorites", favoriteVetsRoutes);
 app.use("/api", apiRoutes);
 
+// Favicon handler (browsers request this automatically)
+app.get("/favicon.ico", function (req, res) {
+  res.status(204).end();
+});
+
 // Root Index Route
 app.get("/", function (req, res) {
   res.json({
